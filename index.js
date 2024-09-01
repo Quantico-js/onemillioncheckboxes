@@ -2,8 +2,20 @@ function clickAllCheckboxes() {
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
   console.log(`Found ${checkboxes.length} checkboxes`);
 
-  let clickedCount = 0;
-  let lastTotal = 0;
+  // Find the last checked checkbox
+  let lastCheckedIndex = -1;
+  for (let i = checkboxes.length - 1; i >= 0; i--) {
+    if (checkboxes[i].checked) {
+      lastCheckedIndex = i;
+      break;
+    }
+  }
+
+  let clickedCount = lastCheckedIndex + 1;
+  let lastTotal = parseInt(localStorage.getItem('lastTotal') || '0');
+
+  console.log(`Starting from checkbox ${clickedCount + 1}`);
+  console.log(`Last recorded total: ${lastTotal}`);
 
   function clickNext() {
     if (clickedCount < checkboxes.length) {
@@ -11,6 +23,8 @@ function clickAllCheckboxes() {
       if (!checkbox.checked && !checkbox.disabled) {
         checkbox.click();
         console.log(`Clicked checkbox ${clickedCount + 1}`);
+      } else {
+        console.log(`Skipped checkbox ${clickedCount + 1} (already checked or disabled)`);
       }
       clickedCount++;
 
@@ -22,6 +36,8 @@ function clickAllCheckboxes() {
           if (currentTotal > lastTotal) {
             lastTotal = currentTotal;
             console.log(`Count updated: ${currentTotal}`);
+            // Save the new total to localStorage
+            localStorage.setItem('lastTotal', lastTotal.toString());
             // Continue clicking
             setTimeout(clickNext, 100);
           } else {
@@ -36,6 +52,8 @@ function clickAllCheckboxes() {
     } else {
       console.log('Finished clicking all checkboxes');
       console.log(`Final count: ${lastTotal}`);
+      // Clear localStorage when finished
+      localStorage.removeItem('lastTotal');
     }
   }
 
